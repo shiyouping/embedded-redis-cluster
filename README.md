@@ -4,14 +4,14 @@ An embedded Redis cluster for Java integration test.
 
 ## Supported Platforms
 
-- macOS arm64
+- macOS
 
 ## Usage
 
 By default, three master nodes will be created, and the ports of master nodes are 16379, 16380 and 16381.
 
 ````
-Config config=new ConfigBuilder().build();
+Config config = new ConfigBuilder().build();
 RedisCluster redisCluster=new RedisCluster(config);
 redisCluster.start();
 redisCluster.stop();

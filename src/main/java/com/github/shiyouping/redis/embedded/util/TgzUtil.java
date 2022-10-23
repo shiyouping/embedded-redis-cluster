@@ -93,7 +93,7 @@ public class TgzUtil {
             properties.load(inputStream);
 
             final String version = properties.getProperty("redis.version");
-            return String.format("macos-arm64-redis-%s", version);
+            return String.format("macos-redis-%s", version);
         } catch (final Exception e) {
             final String message = "Failed to get tgz name";
             TgzUtil.log.error(message, e);
