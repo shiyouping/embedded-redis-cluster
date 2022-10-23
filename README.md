@@ -17,7 +17,7 @@ redisCluster.start();
 redisCluster.stop();
 ````
 
-You may change the default settings by:
+You may change the default settings by Java code:
 
 ````
 // The ports of master nodes are 12000, 12001, 12002 and 12003
@@ -25,4 +25,11 @@ Config config = new ConfigBuilder().masterNodes(4).port(12000).clusterNodeTimeou
 RedisCluster redisCluster = new RedisCluster(config);
 ````
 
+or in environment variables:
+
+````
+REDIS_PORT=12000
+REDIS_MASTER_NODES=4
+REDIS_CLUSTER_NODE_TIMEOUT=5000
+````
 
