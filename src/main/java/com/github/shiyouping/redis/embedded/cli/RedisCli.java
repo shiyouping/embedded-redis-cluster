@@ -2,21 +2,19 @@ package com.github.shiyouping.redis.embedded.cli;
 
 import com.github.shiyouping.redis.embedded.config.Config;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
+import com.github.shiyouping.redis.embedded.util.TgzUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.github.shiyouping.redis.embedded.util.Preconditions.checkArgument;
 import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
 
 /**
@@ -26,8 +24,8 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNu
 @Slf4j
 public class RedisCli {
 
-    private static final String COMMAND_REDIS_CLI = "redis-cli";
-    private static final String COMMAND_REDIS_SERVER = "redis-server";
+    private static final String COMMAND_REDIS_CLI = "./redis-cli";
+    private static final String COMMAND_REDIS_SERVER = "./redis-server";
     private static final String OPTION_CLUSTER_ENABLED = "--cluster-enabled";
     private static final String OPTION_CLUSTER_CONFIG_FILE = "--cluster-config-file";
     private static final String OPTION_CLUSTER_NODE_TIMEOUT = "--cluster-node-timeout";
@@ -52,26 +50,39 @@ public class RedisCli {
     private static final String ENTER = "\n";
 
     private final Config config;
-    private final File workingDirectory;
+    private final RedisFile redisFile;
 
-    public RedisCli(final Config config, final Path workingDirectory) {
+    public RedisCli(final Config config, final RedisFile redisFile) {
         checkNotNull(config, "config cannot be null");
-        checkNotNull(workingDirectory, "workingDirectory cannot be null");
-        checkArgument(Files.isDirectory(workingDirectory), "workingDirectory must be a directory");
-
+        checkNotNull(redisFile, "redisFile cannot be null");
         this.config = config;
-        this.workingDirectory = workingDirectory.toFile();
+        this.redisFile = redisFile;
     }
 
     public void cleanCluster() {
-        final boolean result = FileUtils.deleteQuietly(this.workingDirectory);
-        RedisCli.log.info("Redis cluster cleaned? {}", result);
+        final Path baseDir = this.redisFile.getBaseDir();
+        final boolean succeed = FileUtils.deleteQuietly(baseDir.toFile());
+
+        if (succeed) {
+            RedisCli.log.info("Deleted redis temp dir={}", baseDir);
+        } else {
+            RedisCli.log.warn("Failed to deleted redis temp dir={}", baseDir);
+        }
+
+        RedisCli.log.info("Redis cluster cleaned");
     }
 
     public void createCluster() {
         final List<String> commands = this.buildCreateClusterCommands();
         this.execute(commands);
         RedisCli.log.info("Redis cluster created");
+    }
+
+    public void init() {
+        RedisCli.log.info("Initializing redis environment with redis file={}", this.redisFile);
+        final String source = this.redisFile.getTgzFullName();
+        TgzUtil.copyTgz(source, this.redisFile.getBaseDir());
+        TgzUtil.extractTgz(source, this.redisFile.getBaseDir());
     }
 
     public void startServers() {
@@ -90,8 +101,7 @@ public class RedisCli {
         commands.add(RedisCli.OPTION_CLUSTER);
         commands.add(RedisCli.OPTION_CREATE);
 
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
-                .forEach(port -> commands.add(this.config.getHost() + RedisCli.COLON + port));
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> commands.add(this.config.getHost() + RedisCli.COLON + port));
 
         commands.add(RedisCli.OPTION_CLUSTER_REPLICAS);
         commands.add(String.valueOf(this.config.getClusterReplicas()));
@@ -102,60 +112,58 @@ public class RedisCli {
 
     private List<List<String>> buildStartServersCommands() {
         final List<List<String>> commands = new ArrayList<>(this.getNumOfNode());
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
-                .forEach(port -> {
-                    final List<String> command = new ArrayList<>();
-                    commands.add(command);
-                    command.add(RedisCli.COMMAND_REDIS_SERVER);
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> {
+            final List<String> command = new ArrayList<>();
+            commands.add(command);
+            command.add(RedisCli.COMMAND_REDIS_SERVER);
 
-                    command.add(RedisCli.OPTION_PORT);
-                    command.add(String.valueOf(port));
+            command.add(RedisCli.OPTION_PORT);
+            command.add(String.valueOf(port));
 
-                    command.add(RedisCli.OPTION_PROTECTED_MODE);
-                    command.add(this.config.getProtectedMode());
+            command.add(RedisCli.OPTION_PROTECTED_MODE);
+            command.add(this.config.getProtectedMode());
 
-                    command.add(RedisCli.OPTION_CLUSTER_ENABLED);
-                    command.add(this.config.getClusterEnabled());
+            command.add(RedisCli.OPTION_CLUSTER_ENABLED);
+            command.add(this.config.getClusterEnabled());
 
-                    command.add(RedisCli.OPTION_CLUSTER_NODE_TIMEOUT);
-                    command.add(this.config.getClusterNodeTimeout());
+            command.add(RedisCli.OPTION_CLUSTER_NODE_TIMEOUT);
+            command.add(this.config.getClusterNodeTimeout());
 
-                    command.add(RedisCli.OPTION_APPEND_ONLY);
-                    command.add(this.config.getAppendOnly());
+            command.add(RedisCli.OPTION_APPEND_ONLY);
+            command.add(this.config.getAppendOnly());
 
-                    command.add(RedisCli.OPTION_CLUSTER_CONFIG_FILE);
-                    command.add(this.config.getClusterConfigFile() + RedisCli.HYPHEN + port + ".conf");
+            command.add(RedisCli.OPTION_CLUSTER_CONFIG_FILE);
+            command.add(this.config.getClusterConfigFile() + RedisCli.HYPHEN + port + ".conf");
 
-                    command.add(RedisCli.OPTION_APPEND_FILE_NAME);
-                    command.add(this.config.getAppendFileName() + RedisCli.HYPHEN + port + ".aof");
+            command.add(RedisCli.OPTION_APPEND_FILE_NAME);
+            command.add(this.config.getAppendFileName() + RedisCli.HYPHEN + port + ".aof");
 
-                    command.add(RedisCli.OPTION_DB_FILE_NAME);
-                    command.add(this.config.getDbFileName() + RedisCli.HYPHEN + port + ".rdb");
+            command.add(RedisCli.OPTION_DB_FILE_NAME);
+            command.add(this.config.getDbFileName() + RedisCli.HYPHEN + port + ".rdb");
 
-                    command.add(RedisCli.OPTION_LOG_FILE);
-                    command.add(this.config.getLogFile() + RedisCli.HYPHEN + port + ".log");
+            command.add(RedisCli.OPTION_LOG_FILE);
+            command.add(this.config.getLogFile() + RedisCli.HYPHEN + port + ".log");
 
-                    command.add(RedisCli.OPTION_DAEMONIZE);
-                    command.add(this.config.getDaemonize());
-                });
+            command.add(RedisCli.OPTION_DAEMONIZE);
+            command.add(this.config.getDaemonize());
+        });
 
         return commands;
     }
 
     private List<List<String>> buildStopClusterCommands() {
         final List<List<String>> commands = new ArrayList<>(this.getNumOfNode());
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
-                .forEach(port -> {
-                    final List<String> command = new ArrayList<>();
-                    commands.add(command);
-                    command.add(RedisCli.COMMAND_REDIS_CLI);
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> {
+            final List<String> command = new ArrayList<>();
+            commands.add(command);
+            command.add(RedisCli.COMMAND_REDIS_CLI);
 
-                    command.add(RedisCli.OPTION_P);
-                    command.add(String.valueOf(port));
+            command.add(RedisCli.OPTION_P);
+            command.add(String.valueOf(port));
 
-                    command.add(RedisCli.OPTION_SHUT_DOWN);
-                    command.add(RedisCli.OPTION_NO_SAVE);
-                });
+            command.add(RedisCli.OPTION_SHUT_DOWN);
+            command.add(RedisCli.OPTION_NO_SAVE);
+        });
 
         return commands;
     }
@@ -166,7 +174,7 @@ public class RedisCli {
 
         try {
             final ProcessBuilder builder = new ProcessBuilder(commandList);
-            builder.directory(this.workingDirectory);
+            builder.directory(this.redisFile.getBinDir().toFile());
             builder.inheritIO();
             builder.redirectErrorStream(true);
 

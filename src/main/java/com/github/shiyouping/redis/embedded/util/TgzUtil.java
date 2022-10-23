@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
@@ -26,7 +27,7 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
 @Slf4j
 public class TgzUtil {
 
-    public static void copy(final String source, final Path targetDir) {
+    public static void copyTgz(final String source, final Path targetDir) {
         checkNotBlank(source, "source cannot be blank");
         checkNotNull(targetDir, "targetDir cannot be null");
         checkArgument(Files.isDirectory(targetDir), "targetDir must be a directory");
@@ -37,26 +38,21 @@ public class TgzUtil {
 
         try {
             final URL url = TgzUtil.class.getClassLoader().getResource(source);
-            FileUtils.copyURLToFile(
-                    checkNotNull(url, "url cannot be null"),
-                    targetDir.resolve(source).toFile());
-            TgzUtil.log.info("{} was copied to the targetDir {}", source, targetDir);
+            FileUtils.copyURLToFile(checkNotNull(url, "url cannot be null"), targetDir.resolve(source).toFile());
+            TgzUtil.log.info("{} was copied to {}", source, targetDir);
         } catch (final IOException e) {
-            final String message = "Failed to copy source=" + source + " to the targetDir=" + targetDir;
+            final String message = "Failed to copyTgz source=" + source + " to the targetDir=" + targetDir;
             TgzUtil.log.error(message, e);
             throw new EmbeddedRedisException(message, e);
         }
     }
 
-    public static void decompress(final String source, final Path targetDir) {
+    public static void extractTgz(final String source, final Path targetDir) {
         checkNotNull(source, "source cannot be null");
         checkNotNull(targetDir, "targetDir cannot be null");
         checkArgument(Files.isDirectory(targetDir), "targetDir must be a directory");
 
-        try (final InputStream fis = Files.newInputStream(targetDir.resolve(source));
-                final InputStream bis = new BufferedInputStream(fis);
-                final InputStream gzis = new GzipCompressorInputStream(bis);
-                final ArchiveInputStream tis = new TarArchiveInputStream(gzis)) {
+        try (final InputStream fis = Files.newInputStream(targetDir.resolve(source)); final InputStream bis = new BufferedInputStream(fis); final InputStream gzis = new GzipCompressorInputStream(bis); final ArchiveInputStream tis = new TarArchiveInputStream(gzis)) {
 
             ArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {
@@ -82,8 +78,24 @@ public class TgzUtil {
                     TgzUtil.setPermissions(f.toPath());
                 }
             }
+
+            TgzUtil.log.info("{} was extracted to {}", source, targetDir);
         } catch (final Exception e) {
-            final String message = "Failed to decompress " + source + " to the directory " + targetDir;
+            final String message = "Failed to extractTgz " + source + " to " + targetDir;
+            TgzUtil.log.error(message, e);
+            throw new EmbeddedRedisException(message, e);
+        }
+    }
+
+    public static String getTgzName() {
+        try (final InputStream inputStream = TgzUtil.class.getClassLoader().getResourceAsStream("config.properties")) {
+            final Properties properties = new Properties();
+            properties.load(inputStream);
+
+            final String version = properties.getProperty("redis.version");
+            return String.format("macos-arm64-redis-%s", version);
+        } catch (final Exception e) {
+            final String message = "Failed to get tgz name";
             TgzUtil.log.error(message, e);
             throw new EmbeddedRedisException(message, e);
         }

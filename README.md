@@ -10,7 +10,7 @@ An embedded Redis cluster for Java integration test.
 
 By default, three master nodes will be created, and the ports of master nodes are 16379, 16380 and 16381.
 
-````java
+````
 Config config=new ConfigBuilder().build();
 RedisCluster redisCluster=new RedisCluster(config);
 redisCluster.start();
@@ -19,7 +19,7 @@ redisCluster.stop();
 
 You may change the default settings by:
 
-````java
+````
 // The ports of master nodes are 12000, 12001, 12002 and 12003
 Config config = new ConfigBuilder().masterNodes(4).port(12000).clusterNodeTimeout(5000).build();
 RedisCluster redisCluster = new RedisCluster(config);

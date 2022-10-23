@@ -12,7 +12,7 @@ public class RedisClusterTest {
 
     @Test
     public void runTest() {
-        final Config config = new ConfigBuilder().masterNodes(4).port(2000).clusterNodeTimeout(5000).build();
+        final Config config = new ConfigBuilder().build();
         final RedisCluster redisCluster = new RedisCluster(config);
         redisCluster.start();
         redisCluster.stop();
