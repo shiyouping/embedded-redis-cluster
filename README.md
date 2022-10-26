@@ -4,6 +4,8 @@ An embedded Redis cluster for Java integration test.
 
 ## Supported Platforms
 
+More platforms except Windows will be supported in the future. Currently only the following platforms are supported.
+
 - macOS
 
 ## Usage
