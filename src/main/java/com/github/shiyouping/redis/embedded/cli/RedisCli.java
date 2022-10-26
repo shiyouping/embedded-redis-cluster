@@ -24,8 +24,10 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNu
 @Slf4j
 public class RedisCli {
 
+    private static final String COMMAND_KILL = "kill $(lsof -t -i:%d)";
     private static final String COMMAND_REDIS_CLI = "./redis-cli";
     private static final String COMMAND_REDIS_SERVER = "./redis-server";
+
     private static final String OPTION_CLUSTER_ENABLED = "--cluster-enabled";
     private static final String OPTION_CLUSTER_CONFIG_FILE = "--cluster-config-file";
     private static final String OPTION_CLUSTER_NODE_TIMEOUT = "--cluster-node-timeout";
@@ -92,6 +94,7 @@ public class RedisCli {
 
     public void stopCluster() {
         this.buildStopClusterCommands().forEach(this::execute);
+        this.buildKillPortCommands().forEach(this::execute);
         RedisCli.log.info("Redis cluster stopped");
     }
 
@@ -106,6 +109,15 @@ public class RedisCli {
         commands.add(RedisCli.OPTION_CLUSTER_REPLICAS);
         commands.add(String.valueOf(this.config.getClusterReplicas()));
         commands.add(RedisCli.OPTION_CLUSTER_YES);
+
+        return commands;
+    }
+
+    private List<String> buildKillPortCommands() {
+        final List<String> commands = new ArrayList<>();
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> {
+            commands.add(String.format(RedisCli.COMMAND_KILL, port));
+        });
 
         return commands;
     }
@@ -166,6 +178,20 @@ public class RedisCli {
         });
 
         return commands;
+    }
+
+    private void execute(final String command) {
+        try {
+            RedisCli.log.info("Executing command: {}", command);
+            final Process process = Runtime.getRuntime().exec(command);
+            this.logOutput(process.getInputStream());
+            final int result = process.waitFor();
+            RedisCli.log.info("Execution result={}", result);
+        } catch (final Exception e) {
+            final String message = "Failed to execute command=" + command;
+            RedisCli.log.error(message, e);
+            throw new EmbeddedRedisException(message, e);
+        }
     }
 
     private void execute(final List<String> commandList) {
