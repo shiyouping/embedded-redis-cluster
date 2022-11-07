@@ -10,6 +10,18 @@ More platforms except Windows will be supported in the future. Currently only th
 
 ## Usage
 
+Add this library to Maven pom.xml
+
+````xml
+
+<dependency>
+    <groupId>io.github.shiyouping</groupId>
+    <artifactId>embedded-redis-cluster</artifactId>
+    <version>0.0.3</version>
+    <scope>test</scope>
+</dependency>
+````
+
 By default, three master nodes will be created, and the ports of master nodes are 16379, 16380 and 16381.
 
 ````
