@@ -24,7 +24,7 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNu
 @Slf4j
 public class RedisCli {
 
-    private static final String COMMAND_KILL = "kill $(lsof -t -i:%d)";
+    private static final String COMMAND_KILL = "kill -9 $(lsof -t -i:%d)";
     private static final String COMMAND_REDIS_CLI = "./redis-cli";
     private static final String COMMAND_REDIS_SERVER = "./redis-server";
 

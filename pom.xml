@@ -6,7 +6,7 @@
 
     <groupId>io.github.shiyouping</groupId>
     <artifactId>embedded-redis-cluster</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
 
     <name>Embedded Redis Cluster</name>
     <description>An embedded Redis cluster for Java integration test</description>
@@ -145,6 +145,12 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
