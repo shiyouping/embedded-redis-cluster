@@ -1,5 +1,6 @@
 package com.github.shiyouping.redis.embedded.util;
 
+import com.github.shiyouping.redis.embedded.Platform;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -25,7 +26,10 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
  * @since 23/10/2022
  */
 @Slf4j
-public class TgzUtil {
+public final class TgzUtil {
+
+    private TgzUtil() {
+    }
 
     public static void copyTgz(final String source, final Path targetDir) {
         checkNotBlank(source, "source cannot be blank");
@@ -91,9 +95,13 @@ public class TgzUtil {
         try (final InputStream inputStream = TgzUtil.class.getClassLoader().getResourceAsStream("config.properties")) {
             final Properties properties = new Properties();
             properties.load(inputStream);
-
             final String version = properties.getProperty("redis.version");
-            return String.format("macos-redis-%s", version);
+
+            final Platform platform = PlatformUtil.getPlatform();
+            final String os = platform.getOs().toString().toLowerCase();
+            final String arch = platform.getArch().toString().toLowerCase();
+
+            return String.format("%s-%s-%s", os, arch, version);
         } catch (final Exception e) {
             final String message = "Failed to get tgz name";
             TgzUtil.log.error(message, e);

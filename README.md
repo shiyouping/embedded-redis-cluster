@@ -4,9 +4,15 @@ An embedded Redis cluster for Java integration test.
 
 ## Supported Platforms
 
-More platforms except Windows will be supported in the future. Currently only the following platforms are supported.
+Only the following platforms are supported.
 
-- macOS
+- macOS arm64
+- macOS x86_64
+- Ubuntu arm64
+- Ubuntu x86_64
+- Debian x86_64
+- RedHat x86_64
+- CentOS x86_64
 
 ## Usage
 
@@ -17,7 +23,7 @@ Add this library to Maven pom.xml
 <dependency>
     <groupId>io.github.shiyouping</groupId>
     <artifactId>embedded-redis-cluster</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <scope>test</scope>
 </dependency>
 ````

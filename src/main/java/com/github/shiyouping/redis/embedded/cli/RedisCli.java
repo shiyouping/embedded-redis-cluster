@@ -5,14 +5,12 @@ import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
 import com.github.shiyouping.redis.embedded.util.TgzUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
@@ -184,11 +182,11 @@ public class RedisCli {
         try {
             RedisCli.log.info("Executing command: {}", command);
             final Process process = Runtime.getRuntime().exec(command);
-            this.logOutput(process.getInputStream());
+            this.logOutput(process);
             final int result = process.waitFor();
             RedisCli.log.info("Execution result={}", result);
         } catch (final Exception e) {
-            final String message = "Failed to execute command=" + command;
+            final String message = "Failed to getOutput command=" + command;
             RedisCli.log.error(message, e);
             throw new EmbeddedRedisException(message, e);
         }
@@ -205,12 +203,12 @@ public class RedisCli {
             builder.redirectErrorStream(true);
 
             final Process process = builder.start();
-            this.logOutput(process.getInputStream());
+            this.logOutput(process);
 
             final int result = process.waitFor();
             RedisCli.log.info("Execution result={}", result);
         } catch (final Exception e) {
-            final String message = "Failed to execute command=" + command;
+            final String message = "Failed to getOutput command=" + command;
             RedisCli.log.error(message, e);
             throw new EmbeddedRedisException(message, e);
         }
@@ -220,17 +218,12 @@ public class RedisCli {
         return this.config.getMasterNodes() * (this.config.getClusterReplicas() + 1);
     }
 
-    private void logOutput(final InputStream inputStream) {
-        checkNotNull(inputStream, "inputStream cannot be null");
+    private void logOutput(final Process process) {
+        checkNotNull(process, "process cannot be null");
 
-        try (final BufferedReader output = new BufferedReader(new InputStreamReader(inputStream))) {
-            final String message = output.lines().collect(Collectors.joining(RedisCli.ENTER));
-
-            if (message.isEmpty()) {
-                return;
-            }
-
-            RedisCli.log.debug(message);
+        try {
+            RedisCli.log.info(IOUtils.toString(process.getInputStream(), Charset.defaultCharset()));
+            RedisCli.log.error(IOUtils.toString(process.getErrorStream(), Charset.defaultCharset()));
         } catch (final Exception e) {
             final String message = "Failed to log the command output";
             RedisCli.log.error(message, e);
