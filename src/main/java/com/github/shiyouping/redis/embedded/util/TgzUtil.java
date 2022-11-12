@@ -1,10 +1,16 @@
 package com.github.shiyouping.redis.embedded.util;
 
-import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
+import static com.github.shiyouping.redis.embedded.util.Preconditions.checkArgument;
+import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotBlank;
+import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
 
 import com.github.shiyouping.redis.embedded.Platform;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;

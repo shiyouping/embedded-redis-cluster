@@ -1,6 +1,9 @@
 package com.github.shiyouping.redis.embedded.config;
 
-import static com.github.shiyouping.redis.embedded.util.Environment.*;
+import static com.github.shiyouping.redis.embedded.util.Environment.REDIS_CLUSTER_NODE_TIMEOUT;
+import static com.github.shiyouping.redis.embedded.util.Environment.REDIS_MASTER_NODES;
+import static com.github.shiyouping.redis.embedded.util.Environment.REDIS_PORT;
+import static com.github.shiyouping.redis.embedded.util.Environment.getInt;
 import static com.github.shiyouping.redis.embedded.util.Preconditions.checkArgument;
 
 /**
