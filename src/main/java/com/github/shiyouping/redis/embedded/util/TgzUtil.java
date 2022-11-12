@@ -1,15 +1,9 @@
 package com.github.shiyouping.redis.embedded.util;
 
+import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
+
 import com.github.shiyouping.redis.embedded.Platform;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.io.FileUtils;
-
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -18,8 +12,13 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-
-import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author ricky.shiyouping@gmail.com
@@ -28,8 +27,7 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.*;
 @Slf4j
 public final class TgzUtil {
 
-    private TgzUtil() {
-    }
+    private TgzUtil() {}
 
     public static void copyTgz(final String source, final Path targetDir) {
         checkNotBlank(source, "source cannot be blank");
@@ -42,7 +40,9 @@ public final class TgzUtil {
 
         try {
             final URL url = TgzUtil.class.getClassLoader().getResource(source);
-            FileUtils.copyURLToFile(checkNotNull(url, "url cannot be null"), targetDir.resolve(source).toFile());
+            FileUtils.copyURLToFile(
+                    checkNotNull(url, "url cannot be null"),
+                    targetDir.resolve(source).toFile());
             TgzUtil.log.info("{} was copied to {}", source, targetDir);
         } catch (final IOException e) {
             final String message = "Failed to copyTgz source=" + source + " to the targetDir=" + targetDir;
@@ -56,7 +56,10 @@ public final class TgzUtil {
         checkNotNull(targetDir, "targetDir cannot be null");
         checkArgument(Files.isDirectory(targetDir), "targetDir must be a directory");
 
-        try (final InputStream fis = Files.newInputStream(targetDir.resolve(source)); final InputStream bis = new BufferedInputStream(fis); final InputStream gzis = new GzipCompressorInputStream(bis); final ArchiveInputStream tis = new TarArchiveInputStream(gzis)) {
+        try (final InputStream fis = Files.newInputStream(targetDir.resolve(source));
+                final InputStream bis = new BufferedInputStream(fis);
+                final InputStream gzis = new GzipCompressorInputStream(bis);
+                final ArchiveInputStream tis = new TarArchiveInputStream(gzis)) {
 
             ArchiveEntry entry;
             while ((entry = tis.getNextEntry()) != null) {

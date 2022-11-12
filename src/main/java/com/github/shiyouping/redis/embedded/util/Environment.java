@@ -13,8 +13,7 @@ public final class Environment {
     public static final String REDIS_MASTER_NODES = "REDIS_MASTER_NODES";
     public static final String REDIS_CLUSTER_NODE_TIMEOUT = "REDIS_CLUSTER_NODE_TIMEOUT";
 
-    private Environment() {
-    }
+    private Environment() {}
 
     public static int getInt(final String name, final int defaultValue) {
         try {
@@ -24,7 +23,11 @@ public final class Environment {
             }
             return Integer.parseInt(value);
         } catch (final Exception e) {
-            Environment.log.error("Failed to get the environment variable for {}, use the default value={} instead. Error={}", name, defaultValue, e.getMessage());
+            Environment.log.error(
+                    "Failed to get the environment variable for {}, use the default value={} instead. Error={}",
+                    name,
+                    defaultValue,
+                    e.getMessage());
             return defaultValue;
         }
     }
@@ -37,7 +40,11 @@ public final class Environment {
             }
             return value;
         } catch (final Exception e) {
-            Environment.log.error("Failed to get the environment variable for {}, use the default value={} instead. Error={}", name, defaultValue, e.getMessage());
+            Environment.log.error(
+                    "Failed to get the environment variable for {}, use the default value={} instead. Error={}",
+                    name,
+                    defaultValue,
+                    e.getMessage());
             return defaultValue;
         }
     }

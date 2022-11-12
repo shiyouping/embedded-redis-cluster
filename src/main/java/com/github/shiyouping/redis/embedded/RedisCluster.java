@@ -1,16 +1,15 @@
 package com.github.shiyouping.redis.embedded;
 
+import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
+
 import com.github.shiyouping.redis.embedded.cli.RedisCli;
 import com.github.shiyouping.redis.embedded.cli.RedisFile;
 import com.github.shiyouping.redis.embedded.config.Config;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
 import com.github.shiyouping.redis.embedded.util.TgzUtil;
-import lombok.extern.slf4j.Slf4j;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author ricky.shiyouping@gmail.com
@@ -47,7 +46,13 @@ public class RedisCluster {
             final String tgzExtension = ".tgz";
             final Path redisDir = baseDir.resolve(tgzName);
             final Path binDir = redisDir.resolve("bin");
-            return RedisFile.builder().baseDir(baseDir).redisDir(redisDir).binDir(binDir).tgzName(tgzName).tgzExtension(tgzExtension).build();
+            return RedisFile.builder()
+                    .baseDir(baseDir)
+                    .redisDir(redisDir)
+                    .binDir(binDir)
+                    .tgzName(tgzName)
+                    .tgzExtension(tgzExtension)
+                    .build();
         } catch (final Exception e) {
             final String message = "Failed to create redis file";
             RedisCluster.log.error(message, e);

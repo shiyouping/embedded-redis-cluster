@@ -1,9 +1,8 @@
 package com.github.shiyouping.redis.embedded.cli;
 
+import java.nio.file.Path;
 import lombok.Builder;
 import lombok.Value;
-
-import java.nio.file.Path;
 
 /**
  * RedisFile.

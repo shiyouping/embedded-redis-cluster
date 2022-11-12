@@ -1,9 +1,9 @@
 package com.github.shiyouping.redis.embedded.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.github.shiyouping.redis.embedded.Platform;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class PlatformUtilTest {
 

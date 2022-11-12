@@ -15,10 +15,14 @@ public class Platform {
     private ARCH arch;
 
     public enum OS {
-        MACOS, DEBIAN, REDHAT, UBUNTU
+        MACOS,
+        DEBIAN,
+        REDHAT,
+        UBUNTU
     }
 
     public enum ARCH {
-        X86_64, ARM64
+        X86_64,
+        ARM64
     }
 }

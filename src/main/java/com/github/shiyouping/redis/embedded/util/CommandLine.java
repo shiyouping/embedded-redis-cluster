@@ -1,11 +1,10 @@
 package com.github.shiyouping.redis.embedded.util;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
+import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotBlank;
 
 import java.nio.charset.Charset;
-
-import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotBlank;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 
 /**
  * CommandLine.
@@ -16,9 +15,8 @@ import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotBl
 @Slf4j
 public final class CommandLine {
 
-
     public static String getOutput(final String command) {
-        checkNotBlank(command, "command cannot be null");
+        checkNotBlank(command, "command cannot be blank");
 
         try {
             final Process process = Runtime.getRuntime().exec(command);

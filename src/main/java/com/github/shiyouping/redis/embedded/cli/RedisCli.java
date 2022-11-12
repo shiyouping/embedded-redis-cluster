@@ -1,19 +1,18 @@
 package com.github.shiyouping.redis.embedded.cli;
 
+import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
+
 import com.github.shiyouping.redis.embedded.config.Config;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
 import com.github.shiyouping.redis.embedded.util.TgzUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-
-import static com.github.shiyouping.redis.embedded.util.Preconditions.checkNotNull;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author ricky.shiyouping@gmail.com
@@ -102,7 +101,8 @@ public class RedisCli {
         commands.add(RedisCli.OPTION_CLUSTER);
         commands.add(RedisCli.OPTION_CREATE);
 
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> commands.add(this.config.getHost() + RedisCli.COLON + port));
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
+                .forEach(port -> commands.add(this.config.getHost() + RedisCli.COLON + port));
 
         commands.add(RedisCli.OPTION_CLUSTER_REPLICAS);
         commands.add(String.valueOf(this.config.getClusterReplicas()));
@@ -113,67 +113,70 @@ public class RedisCli {
 
     private List<String> buildKillPortCommands() {
         final List<String> commands = new ArrayList<>();
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> {
-            commands.add(String.format(RedisCli.COMMAND_KILL, port));
-        });
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
+                .forEach(port -> {
+                    commands.add(String.format(RedisCli.COMMAND_KILL, port));
+                });
 
         return commands;
     }
 
     private List<List<String>> buildStartServersCommands() {
         final List<List<String>> commands = new ArrayList<>(this.getNumOfNode());
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> {
-            final List<String> command = new ArrayList<>();
-            commands.add(command);
-            command.add(RedisCli.COMMAND_REDIS_SERVER);
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
+                .forEach(port -> {
+                    final List<String> command = new ArrayList<>();
+                    commands.add(command);
+                    command.add(RedisCli.COMMAND_REDIS_SERVER);
 
-            command.add(RedisCli.OPTION_PORT);
-            command.add(String.valueOf(port));
+                    command.add(RedisCli.OPTION_PORT);
+                    command.add(String.valueOf(port));
 
-            command.add(RedisCli.OPTION_PROTECTED_MODE);
-            command.add(this.config.getProtectedMode());
+                    command.add(RedisCli.OPTION_PROTECTED_MODE);
+                    command.add(this.config.getProtectedMode());
 
-            command.add(RedisCli.OPTION_CLUSTER_ENABLED);
-            command.add(this.config.getClusterEnabled());
+                    command.add(RedisCli.OPTION_CLUSTER_ENABLED);
+                    command.add(this.config.getClusterEnabled());
 
-            command.add(RedisCli.OPTION_CLUSTER_NODE_TIMEOUT);
-            command.add(this.config.getClusterNodeTimeout());
+                    command.add(RedisCli.OPTION_CLUSTER_NODE_TIMEOUT);
+                    command.add(this.config.getClusterNodeTimeout());
 
-            command.add(RedisCli.OPTION_APPEND_ONLY);
-            command.add(this.config.getAppendOnly());
+                    command.add(RedisCli.OPTION_APPEND_ONLY);
+                    command.add(this.config.getAppendOnly());
 
-            command.add(RedisCli.OPTION_CLUSTER_CONFIG_FILE);
-            command.add(this.config.getClusterConfigFile() + RedisCli.HYPHEN + port + ".conf");
+                    command.add(RedisCli.OPTION_CLUSTER_CONFIG_FILE);
+                    command.add(this.config.getClusterConfigFile() + RedisCli.HYPHEN + port + ".conf");
 
-            command.add(RedisCli.OPTION_APPEND_FILE_NAME);
-            command.add(this.config.getAppendFileName() + RedisCli.HYPHEN + port + ".aof");
+                    command.add(RedisCli.OPTION_APPEND_FILE_NAME);
+                    command.add(this.config.getAppendFileName() + RedisCli.HYPHEN + port + ".aof");
 
-            command.add(RedisCli.OPTION_DB_FILE_NAME);
-            command.add(this.config.getDbFileName() + RedisCli.HYPHEN + port + ".rdb");
+                    command.add(RedisCli.OPTION_DB_FILE_NAME);
+                    command.add(this.config.getDbFileName() + RedisCli.HYPHEN + port + ".rdb");
 
-            command.add(RedisCli.OPTION_LOG_FILE);
-            command.add(this.config.getLogFile() + RedisCli.HYPHEN + port + ".log");
+                    command.add(RedisCli.OPTION_LOG_FILE);
+                    command.add(this.config.getLogFile() + RedisCli.HYPHEN + port + ".log");
 
-            command.add(RedisCli.OPTION_DAEMONIZE);
-            command.add(this.config.getDaemonize());
-        });
+                    command.add(RedisCli.OPTION_DAEMONIZE);
+                    command.add(this.config.getDaemonize());
+                });
 
         return commands;
     }
 
     private List<List<String>> buildStopClusterCommands() {
         final List<List<String>> commands = new ArrayList<>(this.getNumOfNode());
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode()).forEach(port -> {
-            final List<String> command = new ArrayList<>();
-            commands.add(command);
-            command.add(RedisCli.COMMAND_REDIS_CLI);
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
+                .forEach(port -> {
+                    final List<String> command = new ArrayList<>();
+                    commands.add(command);
+                    command.add(RedisCli.COMMAND_REDIS_CLI);
 
-            command.add(RedisCli.OPTION_P);
-            command.add(String.valueOf(port));
+                    command.add(RedisCli.OPTION_P);
+                    command.add(String.valueOf(port));
 
-            command.add(RedisCli.OPTION_SHUT_DOWN);
-            command.add(RedisCli.OPTION_NO_SAVE);
-        });
+                    command.add(RedisCli.OPTION_SHUT_DOWN);
+                    command.add(RedisCli.OPTION_NO_SAVE);
+                });
 
         return commands;
     }

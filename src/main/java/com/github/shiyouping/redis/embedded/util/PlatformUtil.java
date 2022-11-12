@@ -1,11 +1,11 @@
 package com.github.shiyouping.redis.embedded.util;
 
+import static com.github.shiyouping.redis.embedded.Platform.ARCH;
+import static com.github.shiyouping.redis.embedded.Platform.OS;
+
 import com.github.shiyouping.redis.embedded.Platform;
 import com.github.shiyouping.redis.embedded.exception.EmbeddedRedisException;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.github.shiyouping.redis.embedded.Platform.ARCH;
-import static com.github.shiyouping.redis.embedded.Platform.OS;
 
 /**
  * PlatformUtil.
@@ -16,9 +16,7 @@ import static com.github.shiyouping.redis.embedded.Platform.OS;
 @Slf4j
 public final class PlatformUtil {
 
-    private PlatformUtil() {
-    }
-
+    private PlatformUtil() {}
 
     public static Platform getPlatform() {
         final String os = System.getProperty("os.name").toLowerCase();
