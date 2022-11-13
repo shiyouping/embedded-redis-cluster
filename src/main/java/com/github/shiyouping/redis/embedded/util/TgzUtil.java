@@ -31,6 +31,7 @@ import org.apache.commons.io.FileUtils;
  * @since 23/10/2022
  */
 @Slf4j
+@SuppressWarnings("PMD")
 public final class TgzUtil {
 
     private TgzUtil() {}

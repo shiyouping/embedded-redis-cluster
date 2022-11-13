@@ -15,7 +15,7 @@ public interface Preconditions {
     }
 
     static String checkNotBlank(final String reference, final String message) {
-        if (reference == null || reference.isEmpty() || reference.trim().isEmpty()) {
+        if (reference == null || reference.trim().isEmpty()) {
             throw new EmbeddedRedisException(message);
         }
 

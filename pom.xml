@@ -151,7 +151,7 @@
         <version>4.7.3.0</version>
         <configuration>
           <!--
-              Check following for config details:
+              Check the following for config details:
               https://github.com/spotbugs/spotbugs-maven-plugin/blob/spotbugs/src/main/groovy/org/codehaus/mojo/spotbugs/BaseViolationCheckMojo.groovy
           -->
           <effort>Max</effort>
@@ -163,6 +163,34 @@
           <execution>
             <goals>
               <goal>check</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.19.0</version>
+        <configuration>
+          <!--
+              Check the following for config details:
+              https://maven.apache.org/plugins/maven-pmd-plugin/check-mojo.html
+              https://maven.apache.org/plugins/maven-pmd-plugin/cpd-check-mojo.html
+          -->
+          <targetJdk>${java.version}</targetJdk>
+          <rulesets>
+            <ruleset>
+              https://raw.githubusercontent.com/apache/maven-pmd-plugin/maven-pmd-plugin-3.19.0/src/main/resources/rulesets/java/maven-pmd-plugin-default.xml
+            </ruleset>
+          </rulesets>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+              <goal>cpd-check</goal>
             </goals>
             <phase>compile</phase>
           </execution>

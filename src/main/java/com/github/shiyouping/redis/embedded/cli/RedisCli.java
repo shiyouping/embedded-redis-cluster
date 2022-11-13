@@ -46,7 +46,6 @@ public class RedisCli {
     private static final String HYPHEN = "-";
     private static final String SPACE = " ";
     private static final String COLON = ":";
-    private static final String ENTER = "\n";
 
     private final Config config;
     private final RedisFile redisFile;
@@ -114,9 +113,7 @@ public class RedisCli {
     private List<String> buildKillPortCommands() {
         final List<String> commands = new ArrayList<>();
         IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
-                .forEach(port -> {
-                    commands.add(String.format(RedisCli.COMMAND_KILL, port));
-                });
+                .forEach(port -> commands.add(String.format(RedisCli.COMMAND_KILL, port)));
 
         return commands;
     }

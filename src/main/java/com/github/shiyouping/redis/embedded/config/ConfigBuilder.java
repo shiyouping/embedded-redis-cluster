@@ -1,4 +1,4 @@
-package com.github.shiyouping.redis.embedded.config;
+package com.github.shiyouping.redis.embedded.config; // NOPMD - suppressed TooManyStaticImports
 
 import static com.github.shiyouping.redis.embedded.util.Environment.REDIS_CLUSTER_NODE_TIMEOUT;
 import static com.github.shiyouping.redis.embedded.util.Environment.REDIS_MASTER_NODES;
@@ -31,7 +31,7 @@ public class ConfigBuilder {
         final String logFile = "log";
         final String daemonize = "yes";
         final int clusterReplicas = 1;
-        final String host = "127.0.0.1";
+        final String host = "127.0.0.1"; // NOPMD - suppressed AvoidUsingHardCodedIP
 
         return new Config(
                 clusterEnabled,
@@ -49,19 +49,19 @@ public class ConfigBuilder {
                 clusterReplicas);
     }
 
-    public ConfigBuilder clusterNodeTimeout(final long clusterNodeTimeout) {
+    private ConfigBuilder clusterNodeTimeout(final long clusterNodeTimeout) {
         checkArgument(clusterNodeTimeout > 0, "clusterNodeTimeout must be > 0");
         this.clusterNodeTimeout = String.valueOf(clusterNodeTimeout);
         return this;
     }
 
-    public ConfigBuilder masterNodes(final int masterNodes) {
+    private ConfigBuilder masterNodes(final int masterNodes) {
         checkArgument(masterNodes >= 3, "masterNodes must be >= 3");
         this.masterNodes = masterNodes;
         return this;
     }
 
-    public ConfigBuilder port(final int port) {
+    private ConfigBuilder port(final int port) {
         checkArgument(port >= 1024, "port must be >= 1024");
         this.port = port;
         return this;
