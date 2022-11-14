@@ -21,6 +21,24 @@ public class ConfigBuilder {
         this.port(getInt(REDIS_PORT, 16379));
     }
 
+    private ConfigBuilder clusterNodeTimeout(final long clusterNodeTimeout) {
+        checkArgument(clusterNodeTimeout > 0, "clusterNodeTimeout must be > 0");
+        this.clusterNodeTimeout = String.valueOf(clusterNodeTimeout);
+        return this;
+    }
+
+    private ConfigBuilder masterNodes(final int masterNodes) {
+        checkArgument(masterNodes >= 3, "masterNodes must be >= 3");
+        this.masterNodes = masterNodes;
+        return this;
+    }
+
+    private ConfigBuilder port(final int port) {
+        checkArgument(port >= 1024, "port must be >= 1024");
+        this.port = port;
+        return this;
+    }
+
     public Config build() {
         final String clusterEnabled = "yes";
         final String clusterConfigFile = "nodes";
@@ -47,23 +65,5 @@ public class ConfigBuilder {
                 this.masterNodes,
                 this.port,
                 clusterReplicas);
-    }
-
-    private ConfigBuilder clusterNodeTimeout(final long clusterNodeTimeout) {
-        checkArgument(clusterNodeTimeout > 0, "clusterNodeTimeout must be > 0");
-        this.clusterNodeTimeout = String.valueOf(clusterNodeTimeout);
-        return this;
-    }
-
-    private ConfigBuilder masterNodes(final int masterNodes) {
-        checkArgument(masterNodes >= 3, "masterNodes must be >= 3");
-        this.masterNodes = masterNodes;
-        return this;
-    }
-
-    private ConfigBuilder port(final int port) {
-        checkArgument(port >= 1024, "port must be >= 1024");
-        this.port = port;
-        return this;
     }
 }

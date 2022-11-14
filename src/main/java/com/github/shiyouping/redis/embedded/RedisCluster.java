@@ -27,18 +27,6 @@ public class RedisCluster {
         this.redisCli.init();
     }
 
-    public void start() {
-        this.redisCli.startServers();
-        this.redisCli.createCluster();
-        RedisCluster.log.info("Redis cluster started");
-    }
-
-    public void stop() {
-        this.redisCli.stopCluster();
-        this.redisCli.cleanCluster();
-        RedisCluster.log.info("Redis cluster stopped");
-    }
-
     private RedisFile createRedisFile() {
         try {
             final Path baseDir = Files.createTempDirectory("embedded-redis-cluster-");
@@ -58,5 +46,17 @@ public class RedisCluster {
             RedisCluster.log.error(message, e);
             throw new EmbeddedRedisException(message, e);
         }
+    }
+
+    void start() {
+        this.redisCli.startServers();
+        this.redisCli.createCluster();
+        RedisCluster.log.info("Redis cluster started");
+    }
+
+    void stop() {
+        this.redisCli.stopCluster();
+        this.redisCli.cleanCluster();
+        RedisCluster.log.info("Redis cluster stopped");
     }
 }

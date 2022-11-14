@@ -76,24 +76,6 @@ public class RedisCli {
         RedisCli.log.info("Redis cluster created");
     }
 
-    public void init() {
-        RedisCli.log.info("Initializing redis environment with redis file={}", this.redisFile);
-        final String source = this.redisFile.getTgzFullName();
-        TgzUtil.copyTgz(source, this.redisFile.getBaseDir());
-        TgzUtil.extractTgz(source, this.redisFile.getBaseDir());
-    }
-
-    public void startServers() {
-        this.buildStartServersCommands().forEach(this::execute);
-        RedisCli.log.info("{} redis servers started", this.getNumOfNode());
-    }
-
-    public void stopCluster() {
-        this.buildStopClusterCommands().forEach(this::execute);
-        this.buildKillPortCommands().forEach(this::execute);
-        RedisCli.log.info("Redis cluster stopped");
-    }
-
     private List<String> buildCreateClusterCommands() {
         final List<String> commands = new ArrayList<>();
         commands.add(RedisCli.COMMAND_REDIS_CLI);
@@ -110,12 +92,55 @@ public class RedisCli {
         return commands;
     }
 
-    private List<String> buildKillPortCommands() {
-        final List<String> commands = new ArrayList<>();
-        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
-                .forEach(port -> commands.add(String.format(RedisCli.COMMAND_KILL, port)));
+    private void execute(final List<String> commandList) {
+        final String command = String.join(RedisCli.SPACE, commandList);
+        RedisCli.log.info("Executing command={}", command);
 
-        return commands;
+        try {
+            final ProcessBuilder builder = new ProcessBuilder(commandList);
+            builder.directory(this.redisFile.getBinDir().toFile());
+            builder.inheritIO();
+            builder.redirectErrorStream(true);
+
+            final Process process = builder.start();
+            this.logOutput(process);
+
+            final int result = process.waitFor();
+            RedisCli.log.info("Execution result={}", result);
+        } catch (final Exception e) {
+            final String message = "Failed to getOutput command=" + command;
+            RedisCli.log.error(message, e);
+            throw new EmbeddedRedisException(message, e);
+        }
+    }
+
+    private int getNumOfNode() {
+        return this.config.getMasterNodes() * (this.config.getClusterReplicas() + 1);
+    }
+
+    private void logOutput(final Process process) {
+        checkNotNull(process, "process cannot be null");
+
+        try {
+            RedisCli.log.info(IOUtils.toString(process.getInputStream(), Charset.defaultCharset()));
+            RedisCli.log.error(IOUtils.toString(process.getErrorStream(), Charset.defaultCharset()));
+        } catch (final Exception e) {
+            final String message = "Failed to log the command output";
+            RedisCli.log.error(message, e);
+            throw new EmbeddedRedisException(message, e);
+        }
+    }
+
+    public void init() {
+        RedisCli.log.info("Initializing redis environment with redis file={}", this.redisFile);
+        final String source = this.redisFile.getTgzFullName();
+        TgzUtil.copyTgz(source, this.redisFile.getBaseDir());
+        TgzUtil.extractTgz(source, this.redisFile.getBaseDir());
+    }
+
+    public void startServers() {
+        this.buildStartServersCommands().forEach(this::execute);
+        RedisCli.log.info("{} redis servers started", this.getNumOfNode());
     }
 
     private List<List<String>> buildStartServersCommands() {
@@ -160,6 +185,12 @@ public class RedisCli {
         return commands;
     }
 
+    public void stopCluster() {
+        this.buildStopClusterCommands().forEach(this::execute);
+        this.buildKillPortCommands().forEach(this::execute);
+        RedisCli.log.info("Redis cluster stopped");
+    }
+
     private List<List<String>> buildStopClusterCommands() {
         final List<List<String>> commands = new ArrayList<>(this.getNumOfNode());
         IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
@@ -178,6 +209,14 @@ public class RedisCli {
         return commands;
     }
 
+    private List<String> buildKillPortCommands() {
+        final List<String> commands = new ArrayList<>();
+        IntStream.range(this.config.getPort(), this.config.getPort() + this.getNumOfNode())
+                .forEach(port -> commands.add(String.format(RedisCli.COMMAND_KILL, port)));
+
+        return commands;
+    }
+
     private void execute(final String command) {
         try {
             RedisCli.log.info("Executing command: {}", command);
@@ -187,45 +226,6 @@ public class RedisCli {
             RedisCli.log.info("Execution result={}", result);
         } catch (final Exception e) {
             final String message = "Failed to getOutput command=" + command;
-            RedisCli.log.error(message, e);
-            throw new EmbeddedRedisException(message, e);
-        }
-    }
-
-    private void execute(final List<String> commandList) {
-        final String command = String.join(RedisCli.SPACE, commandList);
-        RedisCli.log.info("Executing command={}", command);
-
-        try {
-            final ProcessBuilder builder = new ProcessBuilder(commandList);
-            builder.directory(this.redisFile.getBinDir().toFile());
-            builder.inheritIO();
-            builder.redirectErrorStream(true);
-
-            final Process process = builder.start();
-            this.logOutput(process);
-
-            final int result = process.waitFor();
-            RedisCli.log.info("Execution result={}", result);
-        } catch (final Exception e) {
-            final String message = "Failed to getOutput command=" + command;
-            RedisCli.log.error(message, e);
-            throw new EmbeddedRedisException(message, e);
-        }
-    }
-
-    private int getNumOfNode() {
-        return this.config.getMasterNodes() * (this.config.getClusterReplicas() + 1);
-    }
-
-    private void logOutput(final Process process) {
-        checkNotNull(process, "process cannot be null");
-
-        try {
-            RedisCli.log.info(IOUtils.toString(process.getInputStream(), Charset.defaultCharset()));
-            RedisCli.log.error(IOUtils.toString(process.getErrorStream(), Charset.defaultCharset()));
-        } catch (final Exception e) {
-            final String message = "Failed to log the command output";
             RedisCli.log.error(message, e);
             throw new EmbeddedRedisException(message, e);
         }

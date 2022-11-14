@@ -101,24 +101,6 @@ public final class TgzUtil {
         }
     }
 
-    public static String getTgzName() {
-        try (final InputStream inputStream = TgzUtil.class.getClassLoader().getResourceAsStream("config.properties")) {
-            final Properties properties = new Properties();
-            properties.load(inputStream);
-            final String version = properties.getProperty("redis.version");
-
-            final Platform platform = PlatformUtil.getPlatform();
-            final String os = platform.getOs().toString().toLowerCase();
-            final String arch = platform.getArch().toString().toLowerCase();
-
-            return String.format("%s-%s-%s", os, arch, version);
-        } catch (final Exception e) {
-            final String message = "Failed to get tgz name";
-            TgzUtil.log.error(message, e);
-            throw new EmbeddedRedisException(message, e);
-        }
-    }
-
     private static void setPermissions(final Path path) throws IOException {
         if (!path.toString().contains("bin")) {
             return;
@@ -138,5 +120,23 @@ public final class TgzUtil {
         permissions.add(PosixFilePermission.GROUP_EXECUTE);
 
         Files.setPosixFilePermissions(path, permissions);
+    }
+
+    public static String getTgzName() {
+        try (final InputStream inputStream = TgzUtil.class.getClassLoader().getResourceAsStream("config.properties")) {
+            final Properties properties = new Properties();
+            properties.load(inputStream);
+            final String version = properties.getProperty("redis.version");
+
+            final Platform platform = PlatformUtil.getPlatform();
+            final String os = platform.getOs().toString().toLowerCase();
+            final String arch = platform.getArch().toString().toLowerCase();
+
+            return String.format("%s-%s-%s", os, arch, version);
+        } catch (final Exception e) {
+            final String message = "Failed to get tgz name";
+            TgzUtil.log.error(message, e);
+            throw new EmbeddedRedisException(message, e);
+        }
     }
 }
