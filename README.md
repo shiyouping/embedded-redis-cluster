@@ -1,5 +1,7 @@
 # Embedded Redis Cluster
 
+![CI Status](https://github.com/shiyouping/embedded-redis-cluster/actions/workflows/maven.yml/badge.svg?branch=main)
+
 An embedded Redis cluster for Java integration test.
 
 ## Supported Platforms
@@ -28,7 +30,8 @@ Add this library to Maven pom.xml
 </dependency>
 ````
 
-By default, three master nodes will be created, and the ports of master nodes are 16379, 16380 and 16381.
+By default, three master nodes will be created, and the ports of master nodes are 16379, 16380 and
+16381.
 
 ````
 Config config = new ConfigBuilder().build();
