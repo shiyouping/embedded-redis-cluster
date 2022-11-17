@@ -135,6 +135,16 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>0.8.8</version>
+        <configuration>
+          <excludes>
+            <!-- The values should be the path of compiled classes relative to the directory target/classes/ -->
+            <exclude>**/RedisFile*.class</exclude>
+            <exclude>**/embedded/Platform*.class</exclude>
+            <exclude>**/config/*</exclude>
+            <exclude>**/exception/*</exclude>
+            <exclude>*Test</exclude>
+          </excludes>
+        </configuration>
         <executions>
           <execution>
             <id>prepare-agent</id>
@@ -155,13 +165,6 @@
               <goal>check</goal>
             </goals>
             <configuration>
-              <excludes>
-                <exclude>**/RedisFile*</exclude>
-                <exclude>**/Platform*</exclude>
-                <exclude>**/config/*</exclude>
-                <exclude>**/exception/*</exclude>
-                <exclude>*Test</exclude>
-              </excludes>
               <rules>
                 <rule>
                   <element>CLASS</element>
@@ -204,10 +207,7 @@
         <artifactId>spotbugs-maven-plugin</artifactId>
         <version>4.7.3.0</version>
         <configuration>
-          <!--
-              Check the following for config details:
-              https://github.com/spotbugs/spotbugs-maven-plugin/blob/spotbugs/src/main/groovy/org/codehaus/mojo/spotbugs/BaseViolationCheckMojo.groovy
-          -->
+          <!-- Check the following for config details: https://github.com/spotbugs/spotbugs-maven-plugin/blob/spotbugs/src/main/groovy/org/codehaus/mojo/spotbugs/BaseViolationCheckMojo.groovy -->
           <effort>Max</effort>
           <maxRank>1</maxRank>
           <threshold>Low</threshold>
@@ -228,12 +228,11 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>3.19.0</version>
         <configuration>
-          <!--
-              Check the following for config details:
-              https://maven.apache.org/plugins/maven-pmd-plugin/check-mojo.html
-              https://maven.apache.org/plugins/maven-pmd-plugin/cpd-check-mojo.html
-          -->
           <targetJdk>${java.version}</targetJdk>
+          <excludeRoots>
+            <!-- Test classes are excluded by default. Exclude auto generated classes -->
+            <excludeRoot>target/generated-sources</excludeRoot>
+          </excludeRoots>
           <rulesets>
             <ruleset>
               https://raw.githubusercontent.com/apache/maven-pmd-plugin/maven-pmd-plugin-3.19.0/src/main/resources/rulesets/java/maven-pmd-plugin-default.xml
@@ -252,6 +251,16 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>3.3.0</version>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <profiles>
     <profile>
