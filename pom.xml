@@ -92,6 +92,12 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.0.0-M7</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.10.1</version>
         <configuration>
@@ -100,35 +106,22 @@
           <compilerArgs>
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
-
             <arg>--add-exports</arg>
             <arg>jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
           </compilerArgs>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M7</version>
       </plugin>
 
       <plugin>
@@ -138,6 +131,7 @@
         <configuration>
           <excludes>
             <!-- The values should be the path of compiled classes relative to the directory target/classes/ -->
+            <!-- Default settings already exclude auto-generated classes -->
             <exclude>**/RedisFile*.class</exclude>
             <exclude>**/embedded/Platform*.class</exclude>
             <exclude>**/config/*</exclude>
@@ -188,30 +182,10 @@
         <version>2.27.2</version>
         <configuration>
           <java>
+            <!-- Default settings already exclude auto-generated classes, but include test classes -->
             <palantirJavaFormat>
             </palantirJavaFormat>
           </java>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <phase>compile</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.7.3.0</version>
-        <configuration>
-          <!-- Check the following for config details: https://github.com/spotbugs/spotbugs-maven-plugin/blob/spotbugs/src/main/groovy/org/codehaus/mojo/spotbugs/BaseViolationCheckMojo.groovy -->
-          <effort>Max</effort>
-          <maxRank>1</maxRank>
-          <threshold>Low</threshold>
-          <failThreshold>Low</failThreshold>
         </configuration>
         <executions>
           <execution>
@@ -232,6 +206,7 @@
           <excludeRoots>
             <!-- Test classes are excluded by default. Exclude auto generated classes -->
             <excludeRoot>target/generated-sources</excludeRoot>
+            <excludeRoot>target/generated-test-sources</excludeRoot>
           </excludeRoots>
           <rulesets>
             <ruleset>
@@ -244,6 +219,28 @@
             <goals>
               <goal>check</goal>
               <goal>cpd-check</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>4.7.3.0</version>
+        <configuration>
+          <!-- Check the following for config details https://github.com/spotbugs/spotbugs-maven-plugin/blob/spotbugs/src/main/groovy/org/codehaus/mojo/spotbugs/BaseViolationCheckMojo.groovy -->
+          <!-- Default settings already exclude test classes and auto-generated classes -->
+          <effort>Max</effort>
+          <maxRank>1</maxRank>
+          <threshold>Low</threshold>
+          <failThreshold>Low</failThreshold>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
             </goals>
             <phase>compile</phase>
           </execution>
