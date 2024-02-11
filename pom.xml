@@ -232,7 +232,7 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.7.3.0</version>
+        <version>4.8.3.1</version>
         <configuration>
           <!-- Check the following for config details https://github.com/spotbugs/spotbugs-maven-plugin/blob/spotbugs/src/main/groovy/org/codehaus/mojo/spotbugs/BaseViolationCheckMojo.groovy -->
           <!-- Default settings already exclude test classes and auto-generated classes -->
