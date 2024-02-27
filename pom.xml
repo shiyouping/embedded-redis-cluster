@@ -258,7 +258,7 @@
       <plugin>
         <artifactId>maven-jxr-plugin</artifactId>
         <groupId>org.apache.maven.plugins</groupId>
-        <version>3.3.0</version>
+        <version>3.3.2</version>
       </plugin>
     </plugins>
   </reporting>
